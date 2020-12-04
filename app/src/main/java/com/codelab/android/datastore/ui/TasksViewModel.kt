@@ -26,6 +26,7 @@ import com.codelab.android.datastore.UserPreferences
 import com.codelab.android.datastore.data.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import com.codelab.android.datastore.UserPreferences.SortOrder
 
 data class TasksUiModel(
     val tasks: List<Task>,
@@ -74,12 +75,15 @@ class TasksViewModel(
         }
         // sort the tasks
         return when (sortOrder) {
+            SortOrder.UNSPECIFIED -> filteredTasks
             SortOrder.NONE -> filteredTasks
             SortOrder.BY_DEADLINE -> filteredTasks.sortedByDescending { it.deadline }
             SortOrder.BY_PRIORITY -> filteredTasks.sortedBy { it.priority }
             SortOrder.BY_DEADLINE_AND_PRIORITY -> filteredTasks.sortedWith(
                 compareByDescending<Task> { it.deadline }.thenBy { it.priority }
             )
+            // We shouldn't get any other values
+            else -> throw UnsupportedOperationException("$sortOrder not supported")
         }
     }
 
